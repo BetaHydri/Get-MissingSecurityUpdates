@@ -254,7 +254,7 @@ function Get-MissingSecurityUpdates
 		GetMissingUpdates -ComputerName 'Server1'
 	
 	.EXAMPLE
-		GetMissingUpdates-Jan.ps1 -ComputerName 'jantiede-x1' -UpdateSearchFilter 'IsHidden=0 and IsInstalled=0'
+		GetMissingUpdates.ps1 -ComputerName 'jantiede-x1' -UpdateSearchFilter 'IsHidden=0 and IsInstalled=0'
     
 	.OUTPUTS
 		System.String. You can pipe it into a Table and wirte it into a csv for further excel processing.
