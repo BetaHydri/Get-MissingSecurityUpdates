@@ -19,16 +19,16 @@
 		The path to the offline scan file, if file does not exists it will be downloaded via WebClient API
 	
     .EXAMPLE
-		GetMissingUpdates -Server_file 'c:\tmp\myservers.txt'
+		.\Get-MissingSecurityUpdates.ps1 -Server_file 'c:\tmp\myservers.txt'
 	
     .EXAMPLE
-		GetMissingUpdates -ComputerName 'Server1,Server2,Server3'
+		.\Get-MissingSecurityUpdateses.ps1 -ComputerName 'Server1,Server2,Server3'
 	
     .EXAMPLE
-		GetMissingUpdates -ComputerName 'Server1'
+		.\Get-MissingSecurityUpdateses.ps1 -ComputerName 'Server1'
 	
 	.EXAMPLE
-		GetMissingUpdates.ps1 -ComputerName 'jantiede-x1' -UpdateSearchFilter 'IsHidden=0 and IsInstalled=0'
+		.\Get-MissingSecurityUpdates.ps1 -ComputerName 'jantiede-x1' -UpdateSearchFilter 'IsHidden=0 and IsInstalled=0'
     
 	.OUTPUTS
 		System.String. You can pipe it into a Table and write it into a csv for further excel processing.
