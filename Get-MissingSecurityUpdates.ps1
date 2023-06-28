@@ -613,10 +613,10 @@ function Get-WsusCab {
                 $totalBytes = $Global:Data.SourceArgs.TotalBytesToReceive
                 $receivedBytes = $Global:Data.SourceArgs.BytesReceived
                 If ($null -ne $percent) {
-                    Write-Progress -Activity ("Downloading {0} from {1} to {2}" -f $CabFile, $Uri, $CabPath) -Status ("{0} bytes \ {1} bytes" -f $receivedBytes, $totalBytes) -PercentComplete $percent
+                    Write-Progress -Activity ("Downloading {0} from {1}" -f $CabPath, $Uri) -Status ("`n{0} bytes \ {1} bytes" -f $receivedBytes, $totalBytes) -PercentComplete $percent
                 }
             }
-            Write-Progress -Activity ("Downloading {0} from {1} to {2}" -f $CabFile, $Uri, $CabPath) -Status ("{0} bytes \ {1} bytes" -f $receivedBytes, $totalBytes) -Completed
+            Write-Progress -Activity ("Downloading {0} from {1}" -f $CabPath, $Uri) -Status ("`n{0} bytes \ {1} bytes" -f $receivedBytes, $totalBytes) -Completed
         }
         catch [System.Net.WebException], [System.IO.IOException] {
             Write-Host "Unable to download $CabFile from $Uri"
