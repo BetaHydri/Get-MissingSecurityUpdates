@@ -266,7 +266,7 @@ function Get-MissingSecurityUpdates
         # Target machine name
         $ComputerName,
 
-        # Path to wsusscn2.cab
+        # Path to c:\wsusscn2.cab
         $CabPath,
 
         [Parameter()]
@@ -614,7 +614,7 @@ function Get-WsusCab
       Path points to the folder and file e.g. C:\wsusscn2.cab
 
       .EXAMPLE
-      Get-WsusCab -Path c:\wsusscn2.cab
+      Get-WsusCab -CabPath c:\wsusscn2.cab
       Describe what this call does
 
       .NOTES
@@ -711,7 +711,7 @@ foreach ($ComputerName in $Servers){
     # file with path $CabPath doesn't exist
     #Get-WsusCab
     try {
-      Get-WsusCab -Path $CabPath
+      Get-WsusCab -CabPath $CabPath
     }
     #try with Bits
     Catch {
