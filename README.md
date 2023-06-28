@@ -25,7 +25,7 @@
 		.\Get-MissingSecurityUpdateses.ps1 -ComputerName 'Server1,Server2,Server3'
 	
     .EXAMPLE
-		.\Get-MissingSecurityUpdateses.ps1 -ComputerName 'Server1'
+		.\Get-MissingSecurityUpdateses.ps1 -ComputerName 'Server1' | Format-Table | Out-File -Path $env:temp\MissingUpdates-$env:Computername.log
 	
 	.EXAMPLE
 		.\Get-MissingSecurityUpdates.ps1 -ComputerName 'jantiede-x1' -UpdateSearchFilter 'IsHidden=0 and IsInstalled=0'
