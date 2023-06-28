@@ -54,15 +54,15 @@ param
     HelpMessage="Target machines as text file each line one server")]
     [System.String]$Servers_file,
 
-    # Path to wsusscn2.cab e.g. c:\wsusscn2.cab
+    # CabPath to wsusscn2.cab e.g. c:\wsusscn2.cab
     [Parameter(Position=1, 
     Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
-    [System.String]$Path = (Join-Path -Path $env:SystemDrive -ChildPath wsusscn2.cab),
+    [System.String]$CabPath = (Join-Path -Path $env:SystemDrive -ChildPath wsusscn2.cab),
 	
 	# UpdateSearchFilter e.g. 'IsHidden=0 and IsInstalled=0' to retrieve 'Missing Updates' including hidden ones.
     [Parameter(Position=2, 
-    Mandatory = $true,
+    Mandatory = $false,
 	HelpMessage="Filter to show e.g. only missing updates 'IsInstalled=0' or all updates 'IsHidden=0'")]
     [ValidateNotNullOrEmpty()]
     [ValidateSet('IsHidden=0 and IsInstalled=0','IsHidden=0','IsInstalled=0')]
@@ -241,7 +241,7 @@ function Get-MissingSecurityUpdates
     .PARAMETER Server_file	
 		The multiple machines inside a text file
     
-    .PARAMETER Path
+    .PARAMETER CabPath
 		The path to the offline scan file, if file does not exists it will be downloaded via WebClient API
 	
     .EXAMPLE
@@ -267,7 +267,7 @@ function Get-MissingSecurityUpdates
         $ComputerName,
 
         # Path to wsusscn2.cab
-        $Path,
+        $CabPath,
 
         [Parameter()]
         [System.String]
@@ -340,13 +340,13 @@ function Get-MissingSecurityUpdates
 
         try
         {
-            Write-Host ('Using Copy-Item to copy {0} to {1} on {2}' -f $Path, $smbDestination, $ComputerName)
-            Copy-Item -Path $Path -Destination $smbDestination -Force -ErrorAction Stop
+            Write-Host ('Using Copy-Item to copy {0} to {1} on {2}' -f $CabPath, $smbDestination, $ComputerName)
+            Copy-Item -Path $CabPath -Destination $smbDestination -Force -ErrorAction Stop
         }
         catch
         {
-            Write-Host ('Error copying {0} to {1} on target machine {2}' -f $Path, $smbDestination, $ComputerName)
-            Write-Error -Exception $_.Exception -Message ('Error copying {0} to {1} on target machine {2}' -f $Path, $smbDestination, $ComputerName) -TargetObject $Path -Category InvalidOperation
+            Write-Host ('Error copying {0} to {1} on target machine {2}' -f $CabPath, $smbDestination, $ComputerName)
+            Write-Error -Exception $_.Exception -Message ('Error copying {0} to {1} on target machine {2}' -f $CabPath, $smbDestination, $ComputerName) -TargetObject $CabPath -Category InvalidOperation
             return $null
         }
     }
@@ -356,19 +356,19 @@ function Get-MissingSecurityUpdates
         {
             if ($PSVersionTable.PSVersion.Major -lt 5 -or $osPSVersion -lt 3)
             {
-                Write-Host ('Using Send-File to copy {0} to {1} on {2} in 1MB chunks' -f $Path, $destination, $ComputerName)
-                Send-File -Source $Path -Destination $destination -Session $session -ChunkSize 1MB -ErrorAction Stop
+                Write-Host ('Using Send-File to copy {0} to {1} on {2} in 1MB chunks' -f $CabPath, $destination, $ComputerName)
+                Send-File -Source $CabPath -Destination $destination -Session $session -ChunkSize 1MB -ErrorAction Stop
             }
             else
             {
-                Write-Host ('Using Copy-Item -ToSession to copy {0} to {1} on {2}' -f $Path, $destination, $ComputerName)
-                Copy-Item -ToSession $session -Path $Path -Destination $destination -ErrorAction Stop
+                Write-Host ('Using Copy-Item -ToSession to copy {0} to {1} on {2}' -f $CabPath, $destination, $ComputerName)
+                Copy-Item -ToSession $session -Path $CabPath -Destination $destination -ErrorAction Stop
             }
         }
         catch
         {
-            Write-Host ('Error copying {0} to {1} on target machine {2}' -f $Path, $destination, $ComputerName)
-            Write-Error -Exception $_.Exception -Message ('Error copying {0} to {1} on target machine {2}' -f $Path, $destination, $ComputerName) -TargetObject $Path -Category InvalidOperation
+            Write-Host ('Error copying {0} to {1} on target machine {2}' -f $CabPath, $destination, $ComputerName)
+            Write-Error -Exception $_.Exception -Message ('Error copying {0} to {1} on target machine {2}' -f $CabPath, $destination, $ComputerName) -TargetObject $CabPath -Category InvalidOperation
             return $null
         }
     }
@@ -634,7 +634,7 @@ function Get-WsusCab
 
   [CmdletBinding()]
   param(
-      [String]$Path
+      [String]$CabPath
   )
   #$DownloadPath = $env:SystemDrive
   # Name of .cab file for the offline check
@@ -653,21 +653,21 @@ function Get-WsusCab
     $Global:Data = $event
   }
 
-  If (((Test-Path -Path $Path) -eq $false)) {
+  If (((Test-Path -Path $CabPath) -eq $false)) {
     try {
       write-host "Please wait, downloading file: $CabFile"  
-      #$client.DownloadFile($Uri, $Path)
-      $client.DownloadFileAsync($Uri,$Path)
+      #$client.DownloadFile($Uri, $CabPath)
+      $client.DownloadFileAsync($Uri,$CabPath)
       #Show downloading progressbar as long $isDownloaded is not TRUE
       While (-Not $isDownloaded) {
         $percent = $Global:Data.SourceArgs.ProgressPercentage
         $totalBytes = $Global:Data.SourceArgs.TotalBytesToReceive
         $receivedBytes = $Global:Data.SourceArgs.BytesReceived
         If ($null -ne $percent) {
-          Write-Progress -Activity ("Downloading {0} from {1}" -f $CabFile,$Path) -Status ("{0} bytes \ {1} bytes" -f $receivedBytes,$totalBytes) -PercentComplete $percent
+          Write-Progress -Activity ("Downloading {0} from {1}" -f $CabFile,$CabPath) -Status ("{0} bytes \ {1} bytes" -f $receivedBytes,$totalBytes) -PercentComplete $percent
         }
       }
-      Write-Progress -Activity ("Downloading {0} from {1}" -f $CabFile,$Path) -Status ("{0} bytes \ {1} bytes" -f $receivedBytes,$totalBytes) -Completed
+      Write-Progress -Activity ("Downloading {0} from {1}" -f $CabFile,$CabPath) -Status ("{0} bytes \ {1} bytes" -f $receivedBytes,$totalBytes) -Completed
     }
     catch [System.Net.WebException],[System.IO.IOException]
     {
@@ -705,13 +705,13 @@ foreach ($ComputerName in $Servers){
    # No $PSBoundParameters in CASE...
   $parameters = @{
       ComputerName = $ComputerName
-      Path         = $Path
+      Path         = $CabPath
   }
-  if(![System.IO.File]::Exists($Path)){
-    # file with path $path doesn't exist
+  if(![System.IO.File]::Exists($CabPath)){
+    # file with path $CabPath doesn't exist
     #Get-WsusCab
     try {
-      Get-WsusCab -Path $Path
+      Get-WsusCab -Path $CabPath
     }
     #try with Bits
     Catch {
@@ -730,15 +730,15 @@ foreach ($ComputerName in $Servers){
   }
   
   try {
-    if ([System.IO.File]::Exists($Path)) {
+    if ([System.IO.File]::Exists($CabPath)) {
         Get-MissingSecurityUpdates @parameters
     }
     else {
-        Throw [System.IO.FileNotFoundException] "File $Path not found."
+        Throw [System.IO.FileNotFoundException] "File $CabPath not found."
     }
   }
   Catch {
     #Write-Host $Error[0].Exception.Message
-    Write-Error -Exception ([System.IO.FileNotFoundException]::new("Could not find CabFile: $Path")) -ErrorAction Stop
+    Write-Error -Exception ([System.IO.FileNotFoundException]::new("Could not find CabFile: $CabPath")) -ErrorAction Stop
   }
 }
